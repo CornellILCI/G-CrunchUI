@@ -1,0 +1,61 @@
+user  nginx;
+worker_processes  auto;
+
+error_log  /var/log/nginx/error.log notice;
+pid        /var/run/nginx.pid;
+
+
+events {
+    worker_connections  1024;
+    }
+
+
+http {
+    include       /etc/nginx/mime.types;
+        default_type  application/octet-stream;
+
+    log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                          '$status $body_bytes_sent "$http_referer" '
+			                        '"$http_user_agent" "$http_x_forwarded_for"';
+
+    access_log  /var/log/nginx/access.log  main;
+
+    sendfile        on;
+    keepalive_timeout  65;
+
+    include /etc/nginx/conf.d/*.conf;
+    resolver 8.8.8.8;
+    add_header Access-Control-Allow-Origin '*';
+
+    #Add index for directory browsing, assuming this is running the 'status and output module'
+    autoindex on;
+    autoindex_exact_size off;
+    
+ include ssl_params;
+ server {
+
+# If you need to setup a local https->http proxy to stop cross origin errors
+# listen 8081;
+  
+#  set $other_server "https://derp.derp.io"; #Even though endpoint is https, use http on proxy so the 's' gets passed along, says stackoverflow
+  #https://stackoverflow.com/questions/50840101/curl-35-error1408f10bssl-routinesssl3-get-recordwrong-version-number
+ # location /{
+ # if ($request_method = 'OPTIONS') {
+ #                     add_header Access-Control-Allow-Origin '*' always;
+#		      add_header Access-Control-Allow-Headers '*';
+#	add_header 'Access-Control-Max-Age' 1728000;
+#	add_header 'Content-Type' 'text/plain charset=UTF-8';
+#	add_header 'Content-Length' 0;
+#	return 204;
+#	}
+#  	   proxy_pass $other_server;
+#	   proxy_ssl_server_name on;
+#	   include proxy_params;
+#	   proxy_set_header Origin $other_server;
+#	   proxy_hide_header Access-Control-Allow-Origin;
+#	   proxy_set_header Access-Control-Allow-Origin '*';
+#	   add_header Access-Control-Allow-Origin '*';
+#  }
+
+}
+}

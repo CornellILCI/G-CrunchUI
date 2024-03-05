@@ -1,0 +1,160 @@
+ {	'metadata': 
+		{'pagination': {'currentPage': 0, 'pageSize': 1000, 'totalCount': 13543, 'totalPages': 14}, 'status': [], 'datafiles': []},
+	'result': {'data': 
+		[{	'additionalInfo': {'ENTRY_NO': '195', 'datasetId': '3050'}, 
+			'externalReferences': None, 
+			'observationUnitDbId': 'MWCPPtvUppW9A', 
+			'observationUnitName': 'PLOT1', 
+			'germplasmDbId': 'MWCPGnOd19FSR', 
+			'germplasmName': 'TZcp67', 
+			'studyDbId': '20', 
+			'studyName': 'CICI-ESA2021 Winter Trial_1', 
+			'programName': 'ILCI-CICI-ESA Cowpea', 
+			'observations': [], 
+			'locationDbId': '10008', 
+			'locationName': 'Bunda College of Agriculture-Drought Mangt', 
+			'observationUnitPUI': '', 
+			'observationUnitPosition': 
+			{
+				'entryType': 'Test entry', 
+				'geoCoordinates': None, 
+				'observationLevel': 
+					{'levelCode': '1', 'levelName': 'PLOT', 'levelOrder': None}, 
+				'observationLevelRelationships': [
+					{
+					'levelCode': '1', 
+					'levelName': 'PLOT', 
+					'levelOrder': None}, 
+					{
+					'levelCode': '1', 
+					'levelName': 'REP', 
+					'levelOrder': None}, 
+					{
+						'levelCode': '1', 
+						'levelName': 'BLOCK', 
+						'levelOrder': None}], 
+					'positionCoordinateX': None, 'positionCoordinateXType': None, 'positionCoordinateY': None, 'positionCoordinateYType': None}, 
+		'programDbId': 'd2681d02-5702-4155-bd8b-c5ad8edd7ccb', 
+		'seedLotDbId': None, 
+		'treatments': [], 
+		'trialDbId': '3048', 
+		'trialName': 'CICI-ESA2021 Winter Trial'}, 
+	{'additionalInfo':  {'ENTRY_NO': '226', 'datasetId': '3051'}, 'externalReferences': None, 'observationUnitDbId': 'MWCPPfVcXbFId', 'observationUnitName': None, 'germplasmDbId': 'MWCPGOokZuSQh', 'germplasmName': 'MZcp 023', 'studyDbId': '20', 'studyName': 'CICI-ESA2021 Winter Trial_1', 'programName': 'ILCI-CICI-ESA Cowpea', 'observations': [], 'locationDbId': '10008', 'locationName': 'Bunda College of Agriculture-Drought Mangt', 'observationUnitPUI': '', 'observationUnitPosition': {'entryType': 'Test entry', 'geoCoordinates': None, 'observationLevel': {'levelCode': None, 'levelName': 'PLANT', 'levelOrder': None}, 'observationLevelRelationships': None, 'positionCoordinateX': None, 'positionCoordinateXType': None, 'positionCoordinateY': None, 'positionCoordinateYType': None}, 'programDbId': 'd2681d02-5702-4155-bd8b-c5ad8edd7ccb', 'seedLotDbId': None, 'treatments': [], 'trialDbId': '3048', 'trialName': 'CICI-ESA2021 Winter Trial'}]
+	}})
+	
+	
+	The none one:
+	 {'additionalInfo': 
+	 {'ENTRY_NO': '53', 'datasetId': '3019'}, 
+	 'externalReferences': None, 
+	 'observationUnitDbId': 'MWCPPuK0RjByN', 
+	 'observationUnitName': None, 
+	 'germplasmDbId': 'MWCPGPbWiUnVl', 
+	 'germplasmName': 'TVu-2714', 
+	 'studyDbId': '3', 
+	 'studyName': 'ILCI21MWT1_1', 
+	 'programName': 'ILCI-CICI-ESA Cowpea', 
+	 'observations': [], 
+	 'locationDbId': '10005', 
+	 'locationName': 'Bunda College of Agriculture', 
+	 'observationUnitPUI': '', 
+	 'observationUnitPosition': {
+		'entryType': 'Test entry', 'geoCoordinates': None, 
+		'observationLevel': {'levelCode': None, 'levelName': 'PLANT', 'levelOrder': None}, 
+		'observationLevelRelationships': None, 
+		'positionCoordinateX': None, 'positionCoordinateXType': None, 'positionCoordinateY': None, 'positionCoordinateYType': None}, 'programDbId': 'd2681d02-5702-4155-bd8b-c5ad8edd7ccb', 'seedLotDbId': None, 'treatments': [], 'trialDbId': '3010', 'trialName': 'ILCI21MWT1'}
+		
+		
+		Data:
+		
+		{
+  "metadata": {
+    "status": [
+      {}
+    ]
+  },
+  "result": {
+    "callSetDbIds": [		"Cowpea_DB1§420",	"Cowpea_DB1§121",	"Cowpea_DB1§247",	"Cowpea_DB1§102", 	[...],	"Cowpea_DB1§171"
+    ],
+    "dataMatrices": [
+      {
+        "dataMatrix": [[	"0",			"0",			"0",			"0", 			[...],	"0"
+          ],
+          [			"0",	"0",		"0",			"0/1",			".",			[...],	"0"
+          ],
+
+
+          ]
+        ],
+        "dataMatrixAbbreviation": "GT",
+        "dataMatrixName": "Genotype",
+        "dataType": "string"
+      }
+    ],
+    "pagination": [
+      {
+        "dimension": "VARIANTS", (PHENOTYPES - VARIANTDBID)
+        "page": 0,
+        "pageSize": 1000,
+        "totalCount": 2753,
+        "totalPages": 3
+      },
+      {
+        "dimension": "CALLSETS", (GENOTYPES - -CALLSETDBID)
+        "page": 0,
+        "pageSize": 1000,
+        "totalCount": 470,
+        "totalPages": 1
+      }
+    ],
+    "sepPhased": "|",
+    "sepUnphased": "/",
+    "unknownString": ".",
+    "variantDbIds": [
+      "Cowpea_DB1§2_24641",
+      "Cowpea_DB1§2_19235",
+      "Cowpea_DB1§2_27984",
+      "Cowpea_DB1§2_16623",
+      "Cowpea_DB1§2_12556",
+      "Cowpea_DB1§2_54157",
+      "Cowpea_DB1§2_19327",
+      "Cowpea_DB1§2_55445",
+      "Cowpea_DB1§2_28825",
+      "Cowpea_DB1§2_28136",
+      "Cowpea_DB1§2_25371",
+      "Cowpea_DB1§2_29496",
+      "Cowpea_DB1§2_49900",
+      "Cowpea_DB1§2_40451",
+      "Cowpea_DB1§2_09060",
+      "Cowpea_DB1§2_29605",
+      "Cowpea_DB1§2_30402",
+      "Cowpea_DB1§2_10738",
+      "Cowpea_DB1§2_47368",
+      "Cowpea_DB1§2_50498",
+      "Cowpea_DB1§2_14329",
+      "Cowpea_DB1§2_21017",
+      "Cowpea_DB1§2_50771",
+      "Cowpea_DB1§2_48591",
+      "Cowpea_DB1§2_45826",
+      "Cowpea_DB1§2_18399",
+      "Cowpea_DB1§2_26693",
+      "Cowpea_DB1§2_38632",
+      "Cowpea_DB1§2_03520",
+      "Cowpea_DB1§2_23136",
+      "Cowpea_DB1§2_45042",
+      "Cowpea_DB1§2_52504",
+      "Cowpea_DB1§2_39077",
+      "Cowpea_DB1§2_43539",
+      "Cowpea_DB1§2_03707",
+      "Cowpea_DB1§2_42456",
+      "Cowpea_DB1§2_52871",
+      "Cowpea_DB1§2_42993",
+	[...]
+     "Cowpea_DB1§2_26363",
+      "Cowpea_DB1§2_40648"
+    ],
+    "variantSetDbIds": [
+      "Cowpea_DB1§1§R1"
+    ]
+  }
+}

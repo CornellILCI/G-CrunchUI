@@ -1,0 +1,154 @@
+<head>
+<meta charset="UTF-8"><!--Lets see if this fixes anything?-->
+<title>G-Crunch Analysis Status`</title>
+</head>
+
+<style>
+table{
+width: -webkit-fill-available;
+}
+table, th, td {
+  border: 1px solid black;
+  border-collapse: collapse;
+}
+th{
+	background-color:MediumSpringGreen;
+}
+tr:nth-child(even) {
+  background-color: Gainsboro;
+}
+tr:nth-child(odd) {
+  background-color: GhostWhite;
+}
+
+
+</style>
+<h1 style="color:OliveDrab;background-color:MintCream;font-family: 'Courier New', monospace;">G&thinsp;-&thinsp;Crunch - Analysis Status</h1>
+<link rel="stylesheet" property="stylesheet" href="css/GraphicalFilter.css" />
+<link rel="stylesheet" property="stylesheet" href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css">
+<table id="status-table">
+	<tr>
+		<th>Job Id</th>
+		<th>Crop</th>
+		<th>Requested On</th>
+		<th>Status</th>
+		<th>Status Message</th>
+		<th>Result URL</th>
+	</tr>
+</table>
+
+<div id="page-div">
+<label for="page">Page:</label>
+<select id="page-select" onChange="onPageSelect()">
+            <option value="1">1</option>
+</select>
+</div>
+
+<script src="BrAPI.js"></script>
+<script type="text/javascript">
+var fetchRef;
+if (typeof window === 'undefined') {
+    fetchRef = require('node-fetch');
+} else {
+    fetchRef = window.fetch;
+}
+
+addPages();
+updateStatus(1);
+function onPageSelect(){
+	updateStatus(document.getElementById("page-select").value);
+}
+ function addPage(pageNumber){
+ console.log("add page"+pageNumber);
+	select = document.getElementById("page-select");
+	for(i=0;i<select.options.length;i++){
+	if(select.options[i].value == pageNumber) return;
+	//TODO- doesn't work
+	}
+	newOpt=document.createElement("option");
+	newOpt.text=pageNumber;
+	newOpt.value=pageNumber;
+	select.add(newOpt);
+ }
+ function clearTable(){
+ 	table=document.getElementById("status-table");
+	while(table.rows.length >1){
+		table.deleteRow(-1);
+		}
+ }
+ function addRow(rowData){
+	table=document.getElementById("status-table");
+	row=table.insertRow(-1);
+	row.insertCell(0).innerHTML=rowData.requestId;
+	row.insertCell(1).innerHTML=rowData.crop;
+	row.insertCell(2).innerHTML=rowData.createdOn.substring(0,16);//I don't care about seconds and milliseconds
+	row.insertCell(3).innerHTML=rowData.status;
+	row.insertCell(4).innerHTML=(typeof rowData.statusMessage === 'undefined')?"":rowData.statusMessage.substring(0,40);//Please stop saying 'undefined'
+	row.insertCell(5).innerHTML=prettyprintresultdata(rowData.requestId);
+	
+	
+	
+ }
+ //We can make some assumptions
+ function prettyprintresultdata(id){
+  ret="<a href='http://localhost:8080/af/analysis/"+id+"/'>localhost/af/analysis/"+id+"/</a>";
+  return ret;
+ }
+ function onSelectPageNumber(){
+	elementvalue=document.getElementById("page-select").value
+	updateStatus(elementvalue)
+}
+
+function updateStatus(pageNumber){
+
+  
+  var baseUrl="http://localhost:5000";
+	  var requrl = baseUrl+"/v1/requests?page="+(pageNumber-1)+"&pageSize=20"//yeah yeah hardcoded
+      fetchRef(requrl, {
+                    method: 'get',
+                    headers: {
+                      'Content-Type': 'application/json;charset=utf-8'
+                    }
+                })
+                .then((response)=>response.json())
+                .catch(function(reason){
+                    throw(reason);
+					return null;
+                })
+                .then(function(json){
+				result=json.result;
+				clearTable();
+				for(i=0; i < result.data.length; i++){
+					addRow(result.data[i]);
+					}
+                });
+  
+}
+
+function addPages(){
+ var baseUrl="http://localhost:5000";
+	  var requrl = baseUrl+"/v1/requests?page="+1000000+"&pageSize=20"//yeah yeah hardcoded
+      fetchRef(requrl, {
+                    method: 'get',
+                    headers: {
+                      'Content-Type': 'application/json;charset=utf-8'
+                    }
+                })
+                .then((response)=>response.json())
+                .catch(function(reason){
+                    throw(reason);
+					return null;
+                })
+                .then(function(json){
+				metadata = json.metadata;
+				//Add Pages
+				console.log(json.metadata.pagination.totalPages);
+				page=1;
+				while(page <= json.metadata.pagination.totalPages){
+				addPage(page);
+				page+=1;
+				}
+                }); 
+}
+
+</script>

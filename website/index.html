@@ -1,0 +1,924 @@
+<head>
+<meta charset="UTF-8"><!--Lets see if this fixes anything?-->
+<title>G-Crunch</title>
+</head>
+<h1 style="color:OliveDrab;background-color:MintCream;font-family: 'Courier New', monospace;">G&thinsp;-&thinsp;Crunch - Work In Progress</h1>
+<link rel="stylesheet" property="stylesheet" href="/css/GraphicalFilter.css" />
+<link rel="stylesheet" property="stylesheet" href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css">
+<form id="brapi-form" action="#"  class="form-inline" style="margin:1em">
+
+	<div id="pheno-db-select-block">
+		<label>Phenotype Database </label>
+		<select id="pheno-db-select" onchange="onSelectDbRaw('phenotypedb','pheno-db-select')">
+		</select>
+		</div>
+	
+
+
+    <div class="form-group" id="brapi-server-block">
+        <label for="brapi-server">BrAPI Server Address</label>
+        <input type="text" class="form-control" id="brapi-server" name="server">
+    </div>
+    <div class="form-group" id="brapi-server-crop-block">
+        <label for="brapi-server-crop">BrAPI crop</label>
+        <input type="text" class="form-control" id="brapi-server-crop" name="serverCrop">
+    </div>
+	<div class="form-group" id="brapi-username-block">
+        <label for="brapi-username">Username</label>
+        <input type="text" class="form-control" id="brapi-username" name="username">
+    </div>
+    <div class="form-group" id="brapi-password-block">
+        <label for="brapi-password">Password</label>
+        <input type="password" class="form-control" id="brapi-password" name="password" placeholder="••••••••••••">
+    </div>
+    <br>
+    <br>
+    <!--<div class="form-group">
+        <label for="brapi-study">Study ID</label>
+        <input type="text" class="form-control" id="brapi-study" name="study" value="4">
+    </div>-->
+	<div class="form-group">
+        <label for="brapi-study-mult">Study ID(mult)</label>
+		<button type="button" onclick="getStudies(document.getElementById('brapi-server').value)">Load</button>
+		<multi-input id="study-input">
+			<datalist id="studies-list">
+	</datalist>
+<input list="studies-list"/>  
+	</multi-input>
+            </div>
+    <div class="form-group">
+        <label for="brapi-unit">Unit Type</label>
+        <select id="brapi-unit" class="form-control" name="unit">
+            <option value="plot">Plot</option>
+            <option value="plant">Plant</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label>
+          <input type="checkbox" name="group"> Group By Accession
+        </label>
+    </div>
+    <input type="submit" action="#" id="load-brapi" class="btn btn-primary" value="Generate Preview"/>
+</form>
+<div style="width:1000px;padding:1em;position:relative;">
+    <div id="filter_div" style="margin:1em"></div>
+    <div style="width:100%;overflow-x:scroll;">
+        <table id="filtered_results"></table>
+    </div>
+	
+	
+		<h3>Genotype Server Details <a id="removeGenotypeLink" href="javascript:removeGenotypeServer()">[remove]</a></h3>
+	<div id="genotype-form"> <!-- the whole enchilada-->
+	<div id="geno-db-select-block">
+	<label>Genotype Database </label>
+	<select id="geno-db-select" onchange="onSelectDbRaw('genotypedb','geno-db-select')">
+	</select>
+	</div>
+	<div class="form-group" id="brapi-geno-server-block">
+        <label for="brapi-geno-server">Genotype Server Address</label>
+        <input type="text" class="form-control" id="brapi-geno-server" name="server">
+    </div>
+    <div class="form-group" id="brapi-geno-server-crop-block">
+        <label for="brapi-geno-server-crop">Genotype crop</label>
+        <input type="text" class="form-control" id="brapi-geno-server-crop" name="serverCrop">
+    </div>
+	<div class="form-group" id="brapi-geno-username-block">
+        <label for="brapi-geno-username">Genotype Server Username</label>
+        <input type="text" class="form-control" id="brapi-geno-username" name="username">
+    </div>
+    <div class="form-group" id="brapi-geno-password-block">
+        <label for="brapi-geno-password">Genotype Server Password</label>
+        <input type="password" class="form-control" id="brapi-geno-password" name="password" placeholder="••••••••••••">
+    </div>
+	<div class="form-group">
+        <label for="brapi-geno-study-mult">Genotype Study ID(mult)</label>
+		<button type="button" onclick="getGenoStudies(document.getElementById('brapi-geno-server').value)">Load</button>
+		<multi-input id="geno-study-input">
+			<datalist id="geno-studies-list">
+	</datalist>
+<input list="geno-studies-list"/>  
+	</multi-input>
+	<div>
+	<label for="geno-match-type">Data matching algorithm</label>
+	<select id="geno-match-type"  name="geno-match-type">
+            <option value="sampleuid">Sample UID -> Individual Name</option>
+            <option value="other">Other</option>
+        </select>
+		<div/>
+	<label for="geno-match-action">Mismatched Data Selector</label>
+		<select id="geno-match-action"  name="geno-match-action">
+            <option value="pheno">Keep Phenotype</option>
+            <option value="geno">Keep Genotype</option>
+            <option value="both">Keep Both</option>
+            <option value="neither">Keep Only Matching</option>
+            <option value="fail">Reject</option>
+        </select>
+            </div>
+	</div>
+	</div>
+    <br>
+    <br>
+	</div>
+
+<h3>AF query params</h3>	    
+<div id="analysis-db-select-block">
+	<label>Analytics Database </label>
+	<select id="analysis-db-select" onchange="onSelectDbRaw('analysisdb','analysis-db-select')">
+	</select>
+	</div>
+<div id="af-server-block">
+	<label for="af-server">Analytics Framework Server Address</label>
+	<input type="text" class="form-control" id="af-server" name="AF Location">
+</div>
+<button id="load-af-btn">Load AF Configuration</button>
+<p/>
+
+<label>Trait Selection</label>
+<select id="af-trait-selection" disabled="true">
+<option value="-1">Select a trait</option>
+</select>
+<p/>
+
+<label>Analysis Configuration</label>
+<select id="af-a-conf" disabled="true">
+<option value="-1">Load Configuration</option>
+</select>
+<p/>
+
+<!--<label>Analysis Objective</label> 
+<select id="af-a-obj">
+<option value="-1">Select an Objective</option>
+</select>
+<p/> <!-- Analysis Objective makes more sense when not in SESL land. -->
+
+<label>Configuration Formula</label>
+<select id="af-conf-formula" disabled="true">
+<option value="-1">Select a Formula</option>
+</select>
+<p/>
+
+
+
+<label>Configuration Residual</label>
+<select id="af-conf-res" disabled="true">
+<option value="-1">Select a Residual</option>
+</select>
+<p/>
+<label hidden='true'>ExpLocAnalysisPattern</label>
+<select id="af-exp-loc-an" hidden="true"><!-- for now, there's only one option for this-->
+<option value="15" selected="true" hidden="true">Single Experiment - Single Location</option>
+</select>
+<p/>
+<button id="execute-analysis" type="button">Execute Analysis</button>
+<text>
+<p/>
+<label>Job ID:</label><input disabled="true" id="af-job-id" value="********-****-****-****-************"/>
+<button id="simple-file-browser" type="button" disabled>Get Output</button>
+<p id='status-box' style="height: 40px;width: 40px;margin-right: 5px;background-color:grey"/>
+<p/><text>Job Status: </text><text id='status'>Unknown</text>
+<!--
+<input hidden="true" id="af-job-clipboard"/>
+<p/>-->
+	
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.12.0/d3.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js" charset="utf-8"></script>
+<script src="BrAPI.js"></script>
+<script src="multi-input.js"></script>
+<script src="GraphicalFilter.js" charset="utf-8"></script>
+<script type="text/javascript">
+ function addOptionToDropdown(selectElement,elementName,elementValue){
+	newOpt=document.createElement("option");
+	newOpt.text=elementName;
+	newOpt.value=elementValue;
+	selectElement.add(newOpt);//append so list stays in 'order' (I want custom at the top for the demo)
+ }
+ 
+function populateDbFromConf(config){
+var conf=config;
+ window.conf=config;
+ phenoSelect=document.getElementById("pheno-db-select");
+ for(phenoOpt in conf.phenotypedb){
+	phenoItem=conf.phenotypedb[phenoOpt];
+	console.log("adding" + phenoItem.name)
+	addOptionToDropdown(phenoSelect,phenoItem.name,phenoItem.name)
+	if(phenoItem.default!=null){
+		console.log("Setting " + phenoItem.name + " to default")
+		phenoSelect.value=phenoItem.name;
+		phenoSelect.dispatchEvent(new Event('change'));
+	}
+ }
+ 
+ genoSelect=document.getElementById("geno-db-select");
+ for(genoOpt in conf.genotypedb){
+	genoItem=conf.genotypedb[genoOpt];
+	addOptionToDropdown(genoSelect,genoItem.name,genoItem.name)
+	if(genoItem.default!=null){
+		genoSelect.value=genoItem.name;
+		genoSelect.dispatchEvent(new Event('change'));
+	}
+ }
+ anSelect=document.getElementById("analysis-db-select");
+ for(anOpt in conf.analysisdb){
+	anItem=conf.analysisdb[anOpt];
+	addOptionToDropdown(anSelect,anItem.name,anItem.name)
+	if(anItem.default!=null){
+		anSelect.value=anItem.name;
+		anSelect.dispatchEvent(new Event('change'));
+	}
+ }
+}
+
+fetch('./gcrunchconf.json').then((response)=>response.json()).then((json)=>populateDbFromConf(json));
+ //import conf from './gcrunchconf.json';
+ 
+
+ 
+
+//if confName is in serverConfig, display DisplayBlock and set valueElement
+//example: jsonForLocalConf, "address", address-field, address-div
+function showHideServerSelector(serverConfig,confName,valueElement,displayBlock){
+	if(serverConfig[confName]==null){
+		displayBlock.style.display="block";
+		valueElement.value="";
+	}
+	else{
+		displayBlock.style.display="none";
+		valueElement.value=serverConfig[confName];
+	}
+}
+
+function onSelectDbRaw(dbtype,elementname){
+	elementvalue=document.getElementById(elementname).value
+	onSelectDb(dbtype,elementvalue)
+}
+function onSelectDb(dbtype,value){
+//console.log("Reading DB " +value);
+conf=window.conf;
+ dbTypes={"phenotypedb":{
+			"address":"brapi-server",
+			"address-block":"brapi-server-block",
+			"crop":"brapi-server-crop",
+			"crop-block":"brapi-server-crop-block",
+			"user":"brapi-username",
+			"user-block":"brapi-username-block",
+			"password":"brapi-password",
+			"password-block":"brapi-password-block"
+			},
+		"genotypedb":{
+			"address":"brapi-geno-server",
+			"address-block":"brapi-geno-server-block",
+			"crop":"brapi-geno-server-crop",
+			"crop-block":"brapi-geno-server-crop-block",
+			"user":"brapi-geno-username",
+			"user-block":"brapi-geno-username-block",
+			"password":"brapi-geno-password",
+			"password-block":"brapi-geno-password-block"
+		},
+		"analysisdb":{
+		"address":"af-server",
+		"address-block":"af-server-block"
+		}
+		};
+		for(servdata in conf[dbtype]){
+			server=conf[dbtype][servdata];
+			dbEntry=dbTypes[dbtype];
+			if(server.name==value){
+				console.log("Found" + value + "  "+server.name);
+				//address
+				if((dbEntry['address-block']!=null) && (dbEntry['address']!=null)){
+					element=document.getElementById(dbEntry['address'])
+					block=document.getElementById(dbEntry['address-block'])
+					showHideServerSelector(server,'address',element,block);
+				}
+				//crop
+				if((dbEntry['crop-block']!=null) && (dbEntry['crop']!=null)){
+					element=document.getElementById(dbEntry['crop'])
+					block=document.getElementById(dbEntry['crop-block'])
+					showHideServerSelector(server,'crop',element,block);
+				}
+				//user
+				if((dbEntry['user-block']!=null) && (dbEntry['user']!=null)){
+					element=document.getElementById(dbEntry['user'])
+					block=document.getElementById(dbEntry['user-block'])
+					showHideServerSelector(server,'user',element,block);
+				}
+				
+				//password
+				if((dbEntry['password-block']!=null) && (dbEntry['password']!=null)){
+					element=document.getElementById(dbEntry['password'])
+					block=document.getElementById(dbEntry['password-block'])
+					showHideServerSelector(server,'password',element,block);
+				}
+				
+			}//end if name=value
+ }//end for
+ }//endfunc
+</script>
+
+<script type="text/javascript">
+
+//https://stackoverflow.com/a/2995536
+function changeFavicon(src) {
+ var link = document.createElement('link'),
+     oldLink = document.getElementById('dynamic-favicon');
+ link.id = 'dynamic-favicon';
+ link.rel = 'shortcut icon';
+ link.href = src;
+ if (oldLink) {
+  document.head.removeChild(oldLink);
+ }
+ document.head.appendChild(link);
+}
+
+
+function updateStatusDemo(){
+  if (("Notification" in window)) {
+	if (Notification.permission !== "denied" && Notification.permission!=="granted") {
+    // We need to ask the user for permission
+		Notification.requestPermission();
+	}
+  }
+  statusBox=document.getElementById("status-box");
+  statusField=document.getElementById("status");
+  statusField.textContent="Checking...";
+  statusBox.style.backgroundColor="grey";
+  changeFavicon('./icons/thinking.ico');
+			
+  
+  //Wait 20 seconds then succeed
+  setTimeout(updateStatusDemoSuccess,20*1000);
+}
+function updateStatusDemoSuccess(){
+  statusBox=document.getElementById("status-box");
+  statusField=document.getElementById("status");
+  statusField.textContent="Job Success";
+						statusBox.style.backgroundColor="green";
+						changeFavicon('./icons/heart.ico');
+						//flash window
+						window.focus();
+						if (("Notification" in window) && Notification.permission === "granted") {
+							notification = new Notification("G-Crunch Job Success");
+						} 
+
+}
+function updateStatus(){
+
+  if (("Notification" in window)) {
+	if (Notification.permission !== "denied" && Notification.permission!=="granted") {
+    // We need to ask the user for permission
+		Notification.requestPermission();
+	}
+  }
+
+  statusBox=document.getElementById("status-box");
+  statusField=document.getElementById("status");
+  statusField.textContent="Checking...";
+  statusBox.style.backgroundColor="grey";
+  
+  var baseUrl=document.getElementById("af-server").value;
+	  var requrl = baseUrl+"/v1/requests/"+document.getElementById("af-job-id").value;  //AF v1
+      fetchRef(requrl, {
+                    method: 'get',
+                    headers: {
+                      'Content-Type': 'application/json;charset=utf-8'
+                    }
+                })
+                .then((response)=>response.json())
+                .catch(function(reason){
+					statusField.textContent="API Call Failed";
+                    statusBox.style.backgroundColor="red";
+					changeFavicon('./icons/bad.ico');
+					//flash window
+					window.focus();
+						if (("Notification" in window) && Notification.permission === "granted") {
+							notification = new Notification("G-Crunch API Call Failure");
+						} 
+                    throw(reason);
+					return null;
+                })
+                .then(function(json){
+				if(typeof json.result === 'undefined' || typeof json.result.status === 'undefined'){
+					statusField.textContent="API Call Failed";
+                    statusBox.style.backgroundColor="red";
+					changeFavicon('./icons/bad.ico');
+					//flash window
+					window.focus();
+						if (("Notification" in window) && Notification.permission === "granted") {
+							notification = new Notification("G-Crunch API Call Failure");
+						}
+						console.log(json);
+					return;
+				}
+				result=json.result;
+				  	if(result.status == "FAILED" || result.status=="FAILURE"){
+						statusField.textContent="Job Failed";
+						statusBox.style.backgroundColor="red";
+						changeFavicon('./icons/bad.ico');
+						//flash window
+						window.focus();
+						//Throw notification
+						if (("Notification" in window) && Notification.permission === "granted") {
+							notification = new Notification("G-Crunch Job Failure");
+						} 
+					}
+					else if(result.status == "SUCCESS"){
+					  statusField.textContent="Job Success";
+						statusBox.style.backgroundColor="green";
+						changeFavicon('./icons/heart.ico');
+						//flash window
+						window.focus();
+						if (("Notification" in window) && Notification.permission === "granted") {
+							notification = new Notification("G-Crunch Job Success");
+						} 
+						
+					}
+					else{
+					  statusField.textContent=result.status;
+					console.log("Status: " + result.status);
+						statusBox.style.backgroundColor="gray";
+						changeFavicon('./icons/thinking.ico');
+						//run this again in 5 minutes?
+						setTimeout(updateStatus,60*1000*1);//1 minutes in milliseconds, should probably be exponential backoff
+					}
+                });
+  
+}
+function removeGenotypeServer(){
+//Flipflops on undefined variable, so terrible 'typeof' used
+if(typeof restore === 'undefined' || restore == false){
+		document.getElementById("brapi-geno-server").value="";
+		document.getElementById("genotype-form").style.display="none";
+		document.getElementById("removeGenotypeLink").text="[restore]";
+		restore=true;
+	}
+		else{
+		document.getElementById("genotype-form").style.display="block";
+		document.getElementById("removeGenotypeLink").text="[remove]";
+		restore=false;
+}
+
+}
+
+function getStudyList(){
+	var list=[];
+	//document.querySelector('multi-input').shadowRoot.getElementById("study-input").getValues().forEach(value => list.push(value.split(":")[0]));//Numbers only
+	document.getElementById("study-input").getValues().forEach(value => list.push(value.split(":")[0]));//Numbers only
+	
+	//console.log("List");
+	//console.log(list);
+	return list;
+}
+
+function getGenoStudyList(){
+	var list=[];
+	//document.querySelector('multi-input').shadowRoot.getElementById("geno-study-input").getValues().forEach(value => list.push(value.split(":")[0]));//Numbers only	
+	document.getElementById("geno-study-input").getValues().forEach(value => list.push(value.split(":")[0]));//Numbers only
+	
+	//console.log("List");
+	//console.log(list);
+	return list;
+}
+
+
+function getStudyListAsOccurrence(){
+  var list=[];
+  getStudyList().forEach(value => list.push({occurrenceName:"stdyName",occurrenceId:value}));
+  return list;
+}
+function getGenoStudyListAsOccurrence(){
+  var list=[];
+  getGenoStudyList().forEach(value => list.push({occurrenceName:"stdyName",occurrenceId:value}));
+  return list;
+}
+
+function populateDropdownFresh(requrl, auth_params, dropdown){
+for(var option of dropdown){dropdown.remove(option);};
+	populateDropdown(requrl, dropdown);
+};
+
+
+function getStudies(baseUrl){
+//http://services-sandbox.ilci.scienceversa.com:9080/bmsapi/sorghum/brapi/v2/studies?active=true
+var auth_params =  {
+                'username': document.getElementById("brapi-username").value,
+                'password': document.getElementById("brapi-password").value
+            };
+     var tokenauthloc=baseUrl+"brapi/v2/token/";//Gigwa hates /v2/token, but BMS is fine with this
+	 var crop = document.getElementById("brapi-server-crop").value;
+var url = baseUrl + crop+"/"+ "brapi/v2/studies?active=true"; //BMS needs crop....
+var studieslist=document.getElementById("studies-list");
+var token;
+fetchRef(tokenauthloc, {
+                    method: 'post',
+                    headers: {
+                      'Content-Type': 'application/json;charset=utf-8'
+                    },
+					body: JSON.stringify(auth_params)
+                })
+                .then(parse_json_response)
+                .catch(function(reason){
+                    throw(reason);
+                    return null;
+                })
+                .then(function(json){
+					token = json.access_token;
+					if(typeof(window.authString) === 'undefined')window.authString = {};
+					window.authString.access_token = token; //JDLS - this is terrible
+					fetchRef(url, {
+                    method: 'get',
+                    headers: {
+                      'Content-Type': 'application/json;charset=utf-8',
+						'X-Auth-Token': token
+					},
+	            })
+                .then(parse_json_response)
+                .catch(function(reason){
+                    throw(reason);
+                    return null;
+                })
+                .then(function(json){
+					Object.entries(json.result.data).forEach(([key, value]) => {
+							var newOpt=document.createElement("option");
+							newOpt.value=value.studyDbId + ": "+ value.studyName;
+							studieslist.appendChild(newOpt);
+							
+						});
+						document.getElementById('study-input').refresh();
+					});
+
+					});
+ 				
+};
+//end getStudies
+
+function getGenoStudies(baseUrl){
+//http://services-sandbox.ilci.scienceversa.com:9080/bmsapi/brapi/v2/studies?active=true
+var auth_params =  {
+                'username': document.getElementById("brapi-geno-username").value,
+                'password': document.getElementById("brapi-geno-password").value
+            };
+			var genoCrop = document.getElementById("brapi-geno-server-crop").value;
+     var tokenauthloc=baseUrl+genoCrop+"/brapi/v1/token/"; //Gigwa only has /v1/token and a unique auth getter. (Need to do correct oauth at some point anyways)
+	 
+var url = baseUrl +"brapi/v2/studies?active=true";//remove geno from brapi call for (Specifically Gigwa)V2 --JDLS
+var studieslist=document.getElementById("geno-studies-list");
+var token;
+fetchRef(tokenauthloc, {
+                    method: 'post',
+                    headers: {
+                      'Content-Type': 'application/json;charset=utf-8'
+                    },
+					body: JSON.stringify(auth_params)
+                })
+                .then(parse_json_response)
+                .catch(function(reason){
+                    throw(reason);
+                    return null;
+                })
+                .then(function(json){
+					token = json.access_token;
+					console.log('Authorization'+':'+'Bearer ' + token);
+					if(typeof(window.authString) === 'undefined')window.authString = {};
+					window.authString.geno_access_token = token; //JDLS - this is terrible
+					fetchRef(url, {
+                    method: 'get',
+					 headers: {
+                      'Content-Type': 'application/json;charset=utf-8',
+						'X-Auth-Token': token,
+						'Authorization':'Bearer ' + token //X-AUTH-TOKEN not respected?
+					},
+	            })
+                .then(parse_json_response)
+                .catch(function(reason){
+                    throw(reason);
+                    return null;
+                })
+                .then(function(json){
+				//If there are zero entries, probably Gigwa call failed and it's being 'nice' to us... 
+				//You asked for something, but I don't want to give it to you, so here's a 200 with an empty result array, now
+				//don't come back 'till you know how to talk, donchaknow.
+				if(Object.entries(json.result.data).length === 0){
+					console.log("Empty list of studies probably means an auth failure. Or a bad search, but check your auth string carefully");
+					}
+					Object.entries(json.result.data).forEach(([key, value]) => {
+							var newOpt=document.createElement("option");
+							newOpt.value=value.studyDbId + ": "+ value.studyName;
+							studieslist.appendChild(newOpt);
+							
+						});
+						document.getElementById("geno-study-input").refresh();
+					});
+
+					});
+ 				
+};
+//end getStudies
+
+
+//Awful script to get a dropdown from an analytics framework 'get configurations' command
+function populateDropdown(requrl, dropdown){
+      fetchRef(requrl, {
+                    method: 'get',
+                    headers: {
+                      'Content-Type': 'application/json;charset=utf-8'
+                    }
+                })
+                .then(parse_json_response)
+                .catch(function(reason){
+                    throw(reason);
+                    return null;
+                })
+                .then(function(json){
+					console.log(json);
+						Object.entries(json.result.data).forEach(([key, value]) => {
+						if(value.isActive == true){
+							for(var option of dropdown){
+							 if(option.value == -1) dropdown.remove(option);
+							 if(option.value == value.propertyId) return; //option exists
+							}
+							var newOpt=document.createElement("option");
+							newOpt.text=value.propertyName;
+							newOpt.value=value.propertyId;
+							dropdown.add(newOpt);
+							}
+						});
+					});
+				dropdown.disabled=false;
+	};
+	//end PopulateDropdown
+	//Awful script to get a dropdown from an analytics framework 'get configurations' command
+function populateStudyDropdown(requrl, auth_token, dropdown){
+	  fetchRef(requrl, {
+                    method: 'get',
+                    headers: {
+                      'Content-Type': 'application/json;charset=utf-8',
+					  'X-Auth-Token': auth_token
+                    }
+                })
+                .then(parse_json_response)
+                .catch(function(reason){
+                    throw(reason);
+                    return null;
+                })
+                .then(function(json){
+						Object.entries(json.result.data).forEach(([key, value]) => {
+						var id;
+						var name;
+						var hasId=false;
+						var hasName=false;
+						var hasEntry=false;
+						//Top level keys are 0 and 1
+						 Object.entries(value).forEach(([key,value]) => {
+							if(key == 'observationVariableDbId'){
+							id = value;
+							hasId=true;
+							}
+							if(key == 'observationVariableName'){
+							name = value;
+							hasName=true;
+							}
+							if((!hasEntry) && hasName && hasId){
+								for(var option of dropdown){
+									if(option.value == -1) dropdown.remove(option);
+									if(option.value == id+":"+name) {
+									hasEntry=true;
+									break;							 //option exists
+									}	
+								}
+								if(!hasEntry){
+									var newOpt=document.createElement("option");
+									newOpt.text=name;
+									newOpt.value=id+":"+name;
+									console.log("Creating new variable: " + name + " || id#"+id);
+									dropdown.add(newOpt);
+								}
+							}
+							});
+						});
+					});
+				dropdown.disabled=false;
+	};
+	//end PopulateStudyDropdown
+document.getElementById("load-af-btn").onclick=function(){
+  var afserverloc=document.getElementById("af-server").value;
+  
+  var afaConf = document.getElementById("af-a-conf");
+  //var afaObj = document.getElementById("af-a-obj");
+
+
+	var auth_params =  {
+                'username': document.getElementById("brapi-username").value,
+                'password': document.getElementById("brapi-password").value
+            }; 
+  //populate potential trait ids from study list - needs to be v1 for formatting for now. TODO - fix to be v2.?
+    var baseUrl = document.getElementById("brapi-server").value+document.getElementById("brapi-server-crop").value+"/brapi/v1/";
+    var requrl = baseUrl+"variables?studyDbId="+getStudyList()[0];//this can be a comma-separated list
+	var auth_token = window.authString.access_token; //JDLS - this is terrible
+    populateStudyDropdown(requrl,auth_token,document.getElementById("af-trait-selection"));
+
+
+
+	//populate af items
+      var baseUrl=document.getElementById("af-server").value;
+	  var requrl = baseUrl+"/v1/analysis-configs";  
+	  populateDropdown(requrl,afaConf);
+};
+				
+
+document.getElementById("af-a-conf").onchange=function(){
+	var confId=document.getElementById("af-a-conf").value;
+	var afcForm = document.getElementById("af-conf-formula");
+    var afcRes = document.getElementById("af-conf-res");
+	var auth_params =  {
+                'username': document.getElementById("brapi-username").value,
+                'password': document.getElementById("brapi-password").value
+            }; 
+      var baseUrl=document.getElementById("af-server").value;
+	  var requrl = baseUrl+"/v1/analysis-configs/"+confId+"/formulas";  
+	  populateDropdownFresh(requrl,auth_params,afcForm);
+	  var requrl = baseUrl+"/v1/analysis-configs/"+confId+"/residuals";  
+	  populateDropdownFresh(requrl,auth_params,afcRes);
+
+	
+};	
+				
+document.getElementById("simple-file-browser").onclick=function(){
+		//TODO - AF location - but not AF port... hmm
+		linkloc = new URL("http://localhost:8080/af/analysis/"+document.getElementById("af-job-id").value+"/");
+		//var linkloc="http://localhost:8080/af/analysis/"+document.getElementById("af-job-id").value;
+		//var linkloc="ftp://" + "localhost" + "/analysis/"+document.getElementById("af-job-id").value;
+		/*var clipboard = document.getElementById("af-job-clipboard");
+		clipboard.value=linkloc;
+		clipboard.select();
+		clipboard.setSelectionRange(0,999);
+		*/
+		//Open link location
+		window.open(linkloc, '_blank').navigate(linkloc).focus();
+		//navigator.clipboard.writeText(linkloc);
+		//alert("Copied : " + linkloc + " into clipboard");
+		//window.open("file:///C:/",'_blank');
+};
+
+//EXECUTE ANALYSIS
+document.getElementById("execute-analysis").onclick = function(){
+	//Start the status update process - 60 seconds till first status check
+	//TODO - currently in 'demo' mode
+	setTimeout(updateStatus,20*1000*1);//1 minute
+
+		document.getElementById("simple-file-browser").disabled=false;
+		console.log("Will be sent to the server:");
+		var ids = $("#filtered_results").DataTable().table().context[0].aiDisplay;
+		var dataArray=$("#filtered_results").DataTable().data();
+        /**var observationUnitIds=ids.map(id => ({
+				occurrenceId:dataArray[id].data.studyDbId,
+				occurrenceName:dataArray[id].data.observations[0].observationVariableName
+				})
+		);//Ugh
+		console.log(observationUnitIds);		
+		**/
+		var query = {
+    dataSource: "BRAPI",
+    dataSourceUrl: document.getElementById("brapi-server").value+document.getElementById("brapi-server-crop").value+"/"+"brapi/v2/", //TODO - ugh this is bad - also crop needed here, even though v2 (probably, need to double check)?
+    dataSourceAccessToken: window.authString.access_token,
+    requestorId: null,
+    crop: document.getElementById("brapi-server-crop").value,
+    institute: null,
+    analysisType: "ANALYZE",
+    experiments: [//Study should be trialID, but only in BrAPI 2.0
+        {
+            experimentId: getStudyList()[0], //Study ID of the overarching 'experiment'
+            experimentName: "expName", //seems to be ignored
+            
+			occurrences: getStudyListAsOccurrence(),
+			
+			}],
+    traits: [{
+               traitId: document.getElementById("af-trait-selection").value.split(":")[0],//20973 - the one trait in this dataset
+traitName: document.getElementById("af-trait-selection").value.split(":")[1]			   
+            }],
+			
+
+    analysisObjectivePropertyId: document.getElementById(/*"af-a-obj"*/"af-a-conf").value,//setting them both to conf
+    analysisConfigPropertyId: document.getElementById("af-a-conf").value,
+    expLocAnalysisPatternPropertyId: document.getElementById("af-exp-loc-an").value,
+    configFormulaPropertyId: document.getElementById("af-conf-formula").value,
+    configResidualPropertyId: document.getElementById("af-conf-res").value
+};
+	genoServer=document.getElementById("brapi-geno-server").value;
+	if(genoServer!=null && genoServer != ""){
+		query.genoSource= "BrAPI";
+		query.genoSourceUrl= genoServer+/*document.getElementById
+							("brapi-geno-server-crop").value+"/"+*/"brapi/v2/";
+		query.genoSourceAccessToken= window.authString.geno_access_token;
+		query.genoStudyIds = getGenoStudyList();
+		query.genoConnectionType=document.getElementById("geno-match-type").value;
+		query.genoConnectionAction=document.getElementById("geno-match-action").value;
+	}
+      console.log(query);
+      var baseUrl=document.getElementById("af-server").value;
+	  var requrl = baseUrl+"/v1/requests";  //AF v1
+      fetchRef(requrl, {
+                    method: 'post',
+                    headers: {
+                      'Content-Type': 'application/json;charset=utf-8'
+                    },
+                    body: JSON.stringify(query)
+                })
+                .then(parse_json_response)
+                .catch(function(reason){
+                    throw(reason);
+                    return null;
+                })
+                .then(function(json){
+					document.getElementById("af-job-id").value = json.requestId;
+					console.log(json);
+                });	
+};
+function parse_json_response(response) {
+    return response.json();
+}
+var fetchRef;
+if (typeof window === 'undefined') {
+    fetchRef = require('node-fetch');
+} else {
+    fetchRef = window.fetch;
+}
+</script>
+<script type="text/javascript">
+    $(document).ready(function() {
+        var run = false;
+        $("#brapi-form").submit(function() {
+            if (run) {
+                $("#filtered_results").DataTable().destroy();
+                $("#filtered_results").html("");
+            }
+            run = true;
+            var form = $(this).serializeArray().reduce(function(vals, entry) {
+                vals[entry.name] = entry.value
+                return vals
+            }, {});
+            var base_url = form.server;
+            if (base_url.slice(0, 8) != "https://" && base_url.slice(0, 7) != "http://") {
+                base_url = "https://" + base_url;
+            }
+            if (base_url.slice(-1) != "/") {
+                base_url += "/";
+            }
+			base_url = base_url + form.serverCrop + "/";
+            var auth = form.username ? {
+                'username': form.username,
+                'password': form.password
+            } : undefined;
+			var brapi = BrAPI(base_url + "brapi/v1", auth);//TODO - needs to stay v1, Brapi library uses v1 token for auth
+			
+			var params = {
+                "studyDbIds": getStudyList(),//JDLS - horrible hack but w/e
+                "observationLevel": form.unit
+            };
+			
+			
+		//TODO - Fix
+			console.log(auth);
+			console.log(params);
+            var gFilter = GraphicalFilter(
+                brapi.phenotypes_search(params),
+                function(d) {
+				// traits/values
+                    var traits = {}
+					if(d!==undefined){
+							d.observations.forEach(function(obs){
+							traits[obs.observationVariableName] = obs.value;
+							console.log("Obs is ");
+							console.log(obs);
+						});
+					}
+					return traits;
+                
+				},
+                form.group? function(d) {
+                    return {
+                        'Accession':d.germplasmName
+                    }
+                } : function(d) { // header columns accessor
+                    return {
+                        'Study':d.studyName,
+                        'Unit':d.observationUnitName,
+                        'Accession':d.germplasmName,
+                    }
+                },
+                form.group? ["Accession"] : ["Study","Unit","Accession"], // header column order
+                form.group? function(d) { // groupBy function
+                    return d.germplasmDbId
+                } : undefined
+            );
+			window.filtered_div=gFilter.draw("#filter_div","#filtered_results");
+			window.gFilter = gFilter;
+			console.log("results table");
+			console.log(gFilter.results_table);
+            return false;
+        })
+    });
+</script>
