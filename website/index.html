@@ -3,7 +3,7 @@
 <title>G-Crunch</title>
 </head>
 <h1 style="color:OliveDrab;background-color:MintCream;font-family: 'Courier New', monospace;">G&thinsp;-&thinsp;Crunch - Work In Progress</h1>
-<link rel="stylesheet" property="stylesheet" href="/css/GraphicalFilter.css" />
+<link rel="stylesheet" property="stylesheet" href="css/GraphicalFilter.css" />
 <link rel="stylesheet" property="stylesheet" href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css">
 <form id="brapi-form" action="#"  class="form-inline" style="margin:1em">
 
@@ -664,6 +664,7 @@ function populateStudyDropdown(requrl, auth_token, dropdown){
                     return null;
                 })
                 .then(function(json){
+				console.log(json);
 						Object.entries(json.result.data).forEach(([key, value]) => {
 						var id;
 						var name;
@@ -809,7 +810,7 @@ traitName: document.getElementById("af-trait-selection").value.split(":")[1]
 };
 	genoServer=document.getElementById("brapi-geno-server").value;
 	if(genoServer!=null && genoServer != ""){
-		query.genoSource= "BrAPI";
+		query.genoSource= "BRAPI";
 		query.genoSourceUrl= genoServer+/*document.getElementById
 							("brapi-geno-server-crop").value+"/"+*/"brapi/v2/";
 		query.genoSourceAccessToken= window.authString.geno_access_token;
