@@ -1,0 +1,44 @@
+{
+  "phenotypedb": [
+		{"name":"Custom",
+		"type":"BrAPI-Token", 
+		"default":"true"},
+		{
+    		"name":"Random Server",
+    		"type":"BrAPI-Token",
+		"address": "https://bms.server/bmsapi/",
+		"crop": "cowpea",
+		"user": "jdl232"
+	  	}
+	  }
+
+],
+ "genotypedb": [
+		{"name":"Custom",
+		"type":"BrAPI-Token", 
+		"default":"true"},
+		{
+    		"name":"Local",
+		"type":"BrAPI-Token",
+    		"address": "http://localhost:8081/gigwa/rest/",
+		"crop": "Cowpea_DB1",
+		"user": "jdl232"
+	  },
+		{
+    		"name":"Gigwa Server",
+		"type":"BrAPI-Token",
+    		"address": "http://localhost:8081/gigwa/rest/",
+		"crop": "Cowpea_DB1",
+		"user": "jdl232"
+	  }
+	],
+ "analysisdb": [
+		{"name":"Custom",
+		"type":"None", 
+		"default":"true"},
+		{
+    		"name":"Local Analytics Framework",
+		"type":"None",
+    		"address": "http://localhost:5000"
+	  }]
+}
