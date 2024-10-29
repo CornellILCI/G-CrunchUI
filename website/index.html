@@ -107,9 +107,9 @@
 		<div/>
 	<label for="geno-match-action">Mismatched Data Selector</label>
 		<select id="geno-match-action"  name="geno-match-action">
-            <option value="pheno">Keep Phenotype</option>
+            <!--<option value="pheno">Keep Phenotype</option>
             <option value="geno">Keep Genotype</option>
-            <option value="both">Keep Both</option>
+            <option value="both">Keep Both</option>-->
             <option value="neither">Keep Only Matching</option>
             <option value="fail">Reject</option>
         </select>
@@ -133,11 +133,20 @@
 <button id="load-af-btn">Load AF Configuration</button>
 <p/>
 
+
+
 <label>Trait Selection</label>
-<select id="af-trait-selection" disabled="true">
+<!--<select id="af-trait-selection" disabled="true">
 <option value="-1">Select a trait</option>
-</select>
+</select>-->
+<multi-input id="af-trait-selection-multi-input">
+			<datalist id="af-trait-selection-multi">
+	</datalist>
+<input list="af-trait-selection-multi"/>  
+	</multi-input>
 <p/>
+
+
 
 <label>Analysis Configuration</label>
 <select id="af-a-conf" disabled="true">
@@ -499,6 +508,12 @@ for(var option of dropdown){dropdown.remove(option);};
 	populateDropdown(requrl, dropdown);
 };
 
+function getTraitList(){
+var list = [];
+document.getElementById("af-trait-selection-multi-input").getValues().forEach(value => list.push({traitId:value.split(":")[0],traitName:value.split(":")[1]}));
+return list;
+}
+
 
 function getStudies(baseUrl){
 //http://services-sandbox.ilci.scienceversa.com:9080/bmsapi/sorghum/brapi/v2/studies?active=true
@@ -691,7 +706,7 @@ function populateStudyDropdown(requrl, auth_token, dropdown){
 								}
 								if(!hasEntry){
 									var newOpt=document.createElement("option");
-									newOpt.text=name;
+									//newOpt.text=name;
 									newOpt.value=id+":"+name;
 									console.log("Creating new variable: " + name + " || id#"+id);
 									dropdown.add(newOpt);
@@ -718,7 +733,9 @@ document.getElementById("load-af-btn").onclick=function(){
     var baseUrl = document.getElementById("brapi-server").value+document.getElementById("brapi-server-crop").value+"/brapi/v1/";
     var requrl = baseUrl+"variables?studyDbId="+getStudyList()[0];//this can be a comma-separated list
 	var auth_token = window.authString.access_token; //JDLS - this is terrible
-    populateStudyDropdown(requrl,auth_token,document.getElementById("af-trait-selection"));
+    //populateStudyDropdown(requrl,auth_token,document.getElementById("af-trait-selection"));
+	populateMultiStudyDropdown(requrl,auth_token,document.getElementById("af-trait-selection-multi"),document.getElementById("af-trait-selection-multi-input"));
+	
 
 
 
@@ -726,6 +743,12 @@ document.getElementById("load-af-btn").onclick=function(){
       var baseUrl=document.getElementById("af-server").value;
 	  var requrl = baseUrl+"/v1/analysis-configs";  
 	  populateDropdown(requrl,afaConf);
+	  
+	  //Don't know why this doesn't take immediately
+	  setTimeout(()=>{
+	  document.getElementById("af-trait-selection-multi-input").refresh();},2000);
+		
+	  
 };
 				
 
@@ -796,10 +819,10 @@ document.getElementById("execute-analysis").onclick = function(){
 			occurrences: getStudyListAsOccurrence(),
 			
 			}],
-    traits: [{
-               traitId: document.getElementById("af-trait-selection").value.split(":")[0],//20973 - the one trait in this dataset
-traitName: document.getElementById("af-trait-selection").value.split(":")[1]			   
-            }],
+    traits: getTraitList() //[{
+               //traitId: document.getElementById("af-trait-selection").value.split(":")[0],//20973 - the one trait in this dataset
+//traitName: document.getElementById("af-trait-selection").value.split(":")[1]			   
+            ,//}],
 			
 
     analysisObjectivePropertyId: document.getElementById(/*"af-a-obj"*/"af-a-conf").value,//setting them both to conf
@@ -922,4 +945,62 @@ if (typeof window === 'undefined') {
             return false;
         })
     });
+	function populateMultiStudyDropdown(requrl, auth_token, dropdown, multiSelect){
+	  fetchRef(requrl, {
+                    method: 'get',
+                    headers: {
+                      'Content-Type': 'application/json;charset=utf-8',
+					  'X-Auth-Token': auth_token
+                    }
+                })
+                .then(parse_json_response)
+                .catch(function(reason){
+                    throw(reason);
+                    return null;
+                })
+                .then(function(json){
+				console.log(json);
+						Object.entries(json.result.data).forEach(([key, value]) => {
+						var id;
+						var name;
+						var hasId=false;
+						var hasName=false;
+						var hasEntry=false;
+						//Top level keys are 0 and 1
+						 Object.entries(value).forEach(([key,value]) => {
+							if(key == 'observationVariableDbId'){
+							id = value;
+							hasId=true;
+							}
+							if(key == 'observationVariableName'){
+							name = value;
+							hasName=true;
+							}
+							if((!hasEntry) && hasName && hasId){
+								for(var option of dropdown.options){
+									if(option.value == -1) dropdown.removeChild(option);
+									if(option.value == id+":"+name) {
+									hasEntry=true;
+									break;							 //option exists
+									}	
+								}
+								if(!hasEntry){
+									var newOpt=document.createElement("option");
+									newOpt.text=name;
+									newOpt.value=id+":"+name;
+									console.log("Creating new variable: " + name + " || id#"+id);
+									dropdown.appendChild(newOpt);
+								}
+							}
+							});
+						multiSelect.disabled=false;
+						document.getElementById("af-trait-selection-multi-input").refresh();
+
+						});
+					});
+				multiSelect.disabled=false;
+				document.getElementById("af-trait-selection-multi-input").refresh();
+	};
+	//end PopulateMultiStudyDropdown
+
 </script>
